@@ -90,10 +90,10 @@ const PostPage = () => {
         ) : (
           ""
         )}
-        <div className="text-center lg:text-justify text-[1.25rem] font-sansSerif p-6 mb-[1rem] font-bold">
+        <div className="text-justify text-[1rem] font-sansSerif p-6 mb-[1rem] font-bold flex justify-center items-center">
           {post.summary}
         </div>
-        <div className="w-full lg:w-full text-justify text-[18px] lg:p-[2rem] p-4 mb-4 font-notosans leading-relaxed">
+        <div className="w-full lg:w-full text-justify text-[16px] lg:text-[18px] lg:p-[2rem] p-4 mb-4 font-notosans leading-relaxed">
           {post.content}
         </div>
       </div>
