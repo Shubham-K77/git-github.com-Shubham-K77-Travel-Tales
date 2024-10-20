@@ -20,9 +20,6 @@ const PostPage = () => {
           `http://localhost:5555/api/v1/posts/post/${id}`
         );
         const postData = response.data.data;
-        if (postData?.file) {
-          postData.file = postData.file.replace(/\\/g, "/");
-        }
         setPost(postData);
       } catch (error) {
         console.error(error);
@@ -58,7 +55,7 @@ const PostPage = () => {
           <div
             className="w-[90%] h-[65vh] lg:w-[80%] lg:h-[80vh] mt-6 mb-4 rounded-md shadow-md"
             style={{
-              backgroundImage: `url('http://localhost:5555/${post.file}')`,
+              backgroundImage: `url('${post.file}')`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",

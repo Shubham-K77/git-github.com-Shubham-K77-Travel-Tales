@@ -15,7 +15,7 @@ const Navbar = () => {
     const userFetcher = async () => {
       try {
         const response = await axios.get(
-          "https://travel-tales-api.vercel.app/api/v1/users/fetchCookie",
+          "http://localhost:5555/api/v1/users/fetchCookie",
           { withCredentials: true }
         );
         console.log(response);

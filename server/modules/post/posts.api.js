@@ -1,7 +1,7 @@
-//IMPORTS AND CONSTANTS
+// IMPORTS AND CONSTANTS
 import express from "express";
 import multer from "multer";
-import fs from "fs"; //File System
+import cloudinary from "../../config/cloudinary.js";
 import postModel from "./posts.model.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
@@ -9,12 +9,14 @@ import mailer from "../../services/mailer.js";
 import { getUserEmailById } from "../users/users.api.js";
 
 dotenv.config();
+
 const uploadMW = multer({
-  dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5 MB
 });
+
 const postRouter = express.Router();
 const secret = process.env.JWT_SECRET;
+
 // ROUTING PATHS =>
 
 // Get posts
@@ -53,6 +55,7 @@ postRouter.get("/", async (req, res, next) => {
 // Create a new post
 postRouter.post("/create", uploadMW.single("file"), async (req, res, next) => {
   try {
+    console.log("Uploaded file:", req.file);
     if (!req.file) {
       const error = new Error("File Is Required!");
       res.status(400);
@@ -67,42 +70,48 @@ postRouter.post("/create", uploadMW.single("file"), async (req, res, next) => {
       return res.status(401).json({ message: "Invalid token" });
     }
     const userId = decoded.userId;
-    const { originalname, path } = req.file;
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    const newPath = `${path}.${ext}`;
-    fs.renameSync(path, newPath);
     const { title, summary, content } = req.body;
     if (!title || !summary || !content || !userId) {
       const error = new Error("All fields must be filled!");
       res.status(400);
       return next(error);
     }
-    const post = await postModel.create({
-      title,
-      summary,
-      content,
-      file: newPath,
-      author: userId,
-    });
-    if (!post) {
-      const error = new Error("Error creating post! Internal Error!");
-      res.status(500);
-      return next(error);
-    }
-    res
-      .status(201)
-      .send({ message: 'Post Successfully Created!' });
-    const mail = await getUserEmailById(userId);
-    await mailer({ userMail: mail, subject: "newpost", blogTitle: title });
+    // Upload image to Cloudinary using buffer
+    const uploadStream = cloudinary.v2.uploader.upload_stream(
+      async (error, uploadResponse) => {
+        if (error) {
+          console.error("Cloudinary Upload Error: ", error);
+          return res.status(500).send({ message: "Cloudinary upload failed!" });
+        }
+        // Create the post after successful upload
+        const post = await postModel.create({
+          title,
+          summary,
+          content,
+          file: uploadResponse.secure_url,
+          author: userId,
+        });
+        if (!post) {
+          const error = new Error("Error creating post! Internal Error!");
+          res.status(500);
+          return next(error);
+        }
+        res.status(201).send({ message: "Post Successfully Created!" });
+        const mail = await getUserEmailById(userId);
+        await mailer({ userMail: mail, subject: "newpost", blogTitle: title });
+      }
+    );
+    // End the stream with the file buffer
+    uploadStream.end(req.file.buffer);
   } catch (error) {
+    console.error(error);
     error.message = "Internal Error!";
     res.status(500);
     next(error);
   }
 });
 
-//UPDATE POST WITH ID:
+// UPDATE POST WITH ID:
 postRouter.put("/edit/:id", uploadMW.single("file"), async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -112,23 +121,24 @@ postRouter.put("/edit/:id", uploadMW.single("file"), async (req, res, next) => {
       content: req.body.content,
       author: req.body.author,
     };
+
     if (req.file) {
-      const { originalname, path } = req.file;
-      const parts = originalname.split(".");
-      const ext = parts[parts.length - 1];
-      const newPath = `${path}.${ext}`;
-      fs.renameSync(path, newPath);
-      updateFields.file = newPath;
+      // Upload image to Cloudinary
+      const uploadResponse = await cloudinary.v2.uploader.upload(req.file.path);
+      updateFields.file = uploadResponse.secure_url; // Use the URL from Cloudinary
     }
+
     const post = await postModel.findOneAndUpdate({ _id: id }, updateFields, {
       new: true,
     });
+
     if (!post) {
       return res.status(404).json({
         message: "Post not found or you do not have permission to edit it.",
       });
     }
-    res.status(200).send({message: 'Successfully Updated!'});
+
+    res.status(200).send({ message: "Successfully Updated!" });
     const mail = await getUserEmailById(userId);
     await mailer({
       userMail: mail,
@@ -142,7 +152,7 @@ postRouter.put("/edit/:id", uploadMW.single("file"), async (req, res, next) => {
   }
 });
 
-//GET POST WITH ID:
+// GET POST WITH ID:
 postRouter.get("/post/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -160,7 +170,7 @@ postRouter.get("/post/:id", async (req, res, next) => {
   }
 });
 
-//DELETE POST WITH ID:
+// DELETE POST WITH ID:
 postRouter.delete("/delete/:id", async (req, res, next) => {
   try {
     const { id } = req.params;

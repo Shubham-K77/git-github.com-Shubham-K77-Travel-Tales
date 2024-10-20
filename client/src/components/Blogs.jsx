@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line react/prop-types
 const Blogs = ({ id, title, summary, createdAt, author, file }) => {
   createdAt = new Date(createdAt).toLocaleString();
-  // eslint-disable-next-line react/prop-types
-  file = file.replace(/\\/g, "/");
   const navigate = useNavigate();
   const singlePost = () => {
     navigate(`/post/${id}`);
@@ -14,7 +12,7 @@ const Blogs = ({ id, title, summary, createdAt, author, file }) => {
         <div
           className="w-[95%] h-[80vh] lg:w-[32%] lg:h-[45vh] ring-2 ring-gray-200 hover:cursor-pointer"
           style={{
-            backgroundImage: `url('http://localhost:5555/${file}')`,
+            backgroundImage: `url('${file}')`,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",

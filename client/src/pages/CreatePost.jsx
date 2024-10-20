@@ -79,13 +79,13 @@ const CreatePost = () => {
           variant: "error",
         });
       }
-      if (content.length < 300){
+      if (content.length < 300) {
         return enqueueSnackbar("Not Enough Words For The Content!", {
           variant: "error",
         });
       }
       const response = await axios.post(
-        "https://travel-tales-api.vercel.app/api/v1/posts/create",
+        "http://localhost:5555/api/v1/posts/create",
         data,
         {
           headers: {

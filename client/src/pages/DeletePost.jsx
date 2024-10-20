@@ -56,7 +56,6 @@ const DeletePost = () => {
           `http://localhost:5555/api/v1/posts/post/${id}`
         );
         const data = response.data.data;
-        data.file = data.file.replace(/\\/g, "/");
         setPost(data);
       } catch {
         enqueueSnackbar("Can't Retrieve The Data!", { variant: "error" });
@@ -97,13 +96,13 @@ const DeletePost = () => {
         <div
           className="w-[98%] mb-[2rem] h-[90vh] lg:h-[140vh] lg:w-[38%] lg:mt-[0.85rem] shadow-md lg:shadow-xl lg:mb-0"
           style={{
-            backgroundImage: `url('http://localhost:5555/${post.file}')`,
+            backgroundImage: `url('${post.file}')`,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
           }}
         ></div>
-        <div className="w-[98%] mt-[1rem] flex flex-col justify-around items-center p-[1rem] h-[120vh] lg:h-[140vh] mb-[1rem] lg:w-[60%] shadow-md lg:p-0">
+        <div className="w-[98%] mt-[1rem] flex flex-col justify-around items-center p-[1rem] h-[120vh] lg:h-[140vh] mb-[1rem] lg:w-[60%] shadow-md lg:p-[1.25rem]">
           <div className="h-[32vh] w-[95%] lg:h-[14vh] flex justify-around items-center lg:w-[50vw]">
             <div
               className="h-[33vh] w-[44%] lg:h-[36vh] lg:w-[26%] rounded-[50%]"
