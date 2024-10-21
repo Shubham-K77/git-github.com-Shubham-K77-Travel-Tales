@@ -137,7 +137,8 @@ userRouter.post("/logout", (req, res, next) => {
   try {
     res.cookie("token", "", {
       httpOnly: true,
-      secure: false, //http
+      secure: true, //https
+      sameSite: "none",
       maxAge: 0, //0s
     });
     res.status(200).send({ message: "Logged Out! Successfully!" });
