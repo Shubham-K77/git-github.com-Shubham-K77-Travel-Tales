@@ -62,7 +62,7 @@ const PostPage = () => {
             }}
           ></div>
           <div className="flex justify-evenly items-center">
-            <div className="text-center font-cursive lg:text-[2.15rem] text-[2rem] mr-6 font-bold flex justify-center items-center ">
+            <div className="text-center font-cursive lg:text-[2rem] text-[2rem] mr-6 font-bold flex justify-center items-center ">
               {post.title}
             </div>
             <div className="text-right font-cursive text-[1.5rem] pr-1">

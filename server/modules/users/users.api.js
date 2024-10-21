@@ -99,19 +99,34 @@ userRouter.get("/fetchCookie", async (req, res, next) => {
         .status(401)
         .send({ userData: null, message: "No token found" });
     }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userData = await userModel
       .findById(decoded.userId)
       .select("-password");
-
     if (!userData) {
       return res.status(400).send({ message: "User not found" });
     }
-
     res.status(200).send({ userData, message: "Fetched user successfully!" });
   } catch (error) {
     error.message = "Error fetching user!";
+    res.status(500).send({ message: error.message });
+    next(error);
+  }
+});
+
+// Logout route
+userRouter.post("/logout", async (req, res, next) => {
+  try {
+    // Set the cookie with an empty value and a short expiration time
+    res.cookie("token", "", {
+      expires: new Date(Date.now() + 1),
+      httpOnly: true,
+    });
+
+    // Respond with a success message
+    res.status(200).send({ message: "Logged out successfully!" });
+  } catch (error) {
+    error.message = "Internal Error!";
     res.status(500).send({ message: error.message });
     next(error);
   }
