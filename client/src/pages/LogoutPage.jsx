@@ -4,18 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSelector } from "react-redux";
-
+import { useDispatch } from "react-redux";
+import { clearUserInfo } from "path_to_your_userSlice"; // Adjust the path
 const LogoutPage = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(true);
   const userToken = useSelector((state) => state.user.userData);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!userToken) {
       enqueueSnackbar("User Not Logged In!", { variant: "warning" });
-      setLoading(false); // Stop loading if user is not logged in
-      navigate("/"); // Redirect to home page
+      setLoading(false);
+      navigate("/");
     } else {
       const handleLogout = async () => {
         try {
@@ -26,27 +28,23 @@ const LogoutPage = () => {
           );
 
           if (response.status === 200) {
+            dispatch(clearUserInfo());
             enqueueSnackbar("Logging Out! Success!", { variant: "success" });
             setTimeout(() => {
-              navigate("/"); // Redirect to home after successful logout
+              navigate("/");
             }, 3000);
-          } else {
-            enqueueSnackbar("Logging Out! Failed!", { variant: "error" });
-            setTimeout(() => {
-              navigate("/logout"); // Stay on the logout page if failed
-            }, 2000);
           }
         } catch (error) {
           enqueueSnackbar("Internal Error!", { variant: "error" });
           console.error("Logout failed:", error);
         } finally {
-          setLoading(false); // Ensure loading state is stopped
+          setLoading(false);
         }
       };
 
       handleLogout();
     }
-  }, [enqueueSnackbar, navigate, userToken]);
+  }, [enqueueSnackbar, navigate, userToken, dispatch]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -60,5 +58,4 @@ const LogoutPage = () => {
     </div>
   );
 };
-
 export default LogoutPage;
