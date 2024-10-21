@@ -19,7 +19,7 @@ const LogoutPage = () => {
       const handleLogout = async () => {
         try {
           const response = await axios.post(
-            "http://localhost:5555/api/v1/users/logout",
+            "https://travel-tales-api.vercel.app/api/v1/users/logout",
             {},
             { withCredentials: true }
           );

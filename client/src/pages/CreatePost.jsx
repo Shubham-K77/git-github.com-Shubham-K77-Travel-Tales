@@ -85,7 +85,7 @@ const CreatePost = () => {
         });
       }
       const response = await axios.post(
-        "http://localhost:5555/api/v1/posts/create",
+        "https://travel-tales-api.vercel.app/api/v1/posts/create",
         data,
         {
           headers: {

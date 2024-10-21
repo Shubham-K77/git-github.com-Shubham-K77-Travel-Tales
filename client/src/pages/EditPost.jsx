@@ -55,7 +55,7 @@ const EditPost = () => {
     const fetchPost = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5555/api/v1/posts/post/${id}`
+          `https://travel-tales-api.vercel.app/api/v1/posts/post/${id}`
         );
         const data = response.data.data;
         setTitle(data.title);
@@ -105,7 +105,7 @@ const EditPost = () => {
         });
       }
       const edit = await axios.put(
-        `http://localhost:5555/api/v1/posts/edit/${id}`,
+        `https://travel-tales-api.vercel.app/api/v1/posts/edit/${id}`,
         data,
         {
           headers: {

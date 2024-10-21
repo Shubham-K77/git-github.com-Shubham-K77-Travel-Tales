@@ -25,7 +25,7 @@ const LoginPage = () => {
     try {
       // Send login request
       const query = await axios.post(
-        "http://localhost:5555/api/v1/users/login/",
+        "https://travel-tales-api.vercel.app/api/v1/users/login/",
         { email, password },
         {
           withCredentials: true,

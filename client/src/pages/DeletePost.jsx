@@ -53,7 +53,7 @@ const DeletePost = () => {
     const fetchPost = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5555/api/v1/posts/post/${id}`
+          `https://travel-tales-api.vercel.app/api/v1/posts/post/${id}`
         );
         const data = response.data.data;
         setPost(data);
@@ -69,7 +69,7 @@ const DeletePost = () => {
     try {
       setLoading(true);
       const query = await axios.delete(
-        `http://localhost:5555/api/v1/posts/delete/${id}`
+        `https://travel-tales-api.vercel.app/api/v1/posts/delete/${id}`
       );
       if (!query || query.status !== 200) {
         setLoading(false);

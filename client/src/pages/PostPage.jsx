@@ -17,7 +17,7 @@ const PostPage = () => {
     const fetchPost = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5555/api/v1/posts/post/${id}`
+          `https://travel-tales-api.vercel.app/api/v1/posts/post/${id}`
         );
         const postData = response.data.data;
         setPost(postData);

@@ -34,7 +34,7 @@ const RegisterPage = () => {
       }
       // Data are filled properly
       const create = await axios.post(
-        "http://localhost:5555/api/v1/users/register/",
+        "https://travel-tales-api.vercel.app/api/v1/users/register/",
         {
           name,
           email,

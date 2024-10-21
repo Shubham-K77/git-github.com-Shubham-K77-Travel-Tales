@@ -13,7 +13,9 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:5555/api/v1/posts/");
+        const response = await axios.get(
+          "https://travel-tales-api.vercel.app/api/v1/posts/"
+        );
         if (!response || response.data.data.length === 0) {
           return enqueueSnackbar("No Posts Found!", { variant: "info" });
         }
