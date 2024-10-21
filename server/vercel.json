@@ -11,5 +11,10 @@
       "src": "/api/(.*)",
       "dest": "index.js"
     }
-  ]
+  ],
+  "functions": {
+    "api/v1/**": {
+      "regions": ["bom1"]
+    }
+  }
 }
