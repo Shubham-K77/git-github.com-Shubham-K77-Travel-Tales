@@ -53,6 +53,12 @@ const CreatePost = () => {
     }
   }, [userData, navigate, enqueueSnackbar]);
 
+  // Function to strip HTML tags
+  const stripHtmlTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   const submitHandle = async () => {
     // Validation for required fields
     if (!title || !summary || !content || !files) {
@@ -85,7 +91,7 @@ const CreatePost = () => {
       const data = new FormData();
       data.set("title", title);
       data.set("summary", summary);
-      data.set("content", content);
+      data.set("content", content); // Saving plain text content
       if (files && files.length > 0) {
         data.set("file", files[0]); // Assuming only one file upload
       }
@@ -196,16 +202,16 @@ const CreatePost = () => {
                 formats={formats}
                 value={content}
                 name="content"
-                onChange={(newValue) => setContent(newValue)}
+                onChange={(newValue) => setContent(stripHtmlTags(newValue))} // Strip HTML tags here
                 required
               />
             </div>
-            <div className="mb-[1rem]">
+            <div className="h-[10vh] lg:h-[11vh] flex justify-center items-center">
               <button
                 type="submit"
-                className="h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-white border-2 hover:ring-2 hover:ring-green-500 rounded-md bg-green-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw] shadow-md mt-[3rem] hover:bg-green-600"
+                className="h-[8vh] w-[50vw] p-2 bg-green-500 text-[1.5rem] text-white font-bold rounded-md hover:scale-105 transition-transform lg:text-[2rem] lg:h-[10vh] lg:w-[20vw]"
               >
-                Create Post
+                Post
               </button>
             </div>
           </form>
