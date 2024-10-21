@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
+import { FaSpinner } from "react-icons/fa6";
 
 const DeletePost = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -86,7 +87,11 @@ const DeletePost = () => {
   };
 
   if (!post) {
-    return <div>Loading post data...</div>; // Show loading indicator
+    return (
+      <div className="w-full h-[100vh] flex justify-center items-center text-[3rem]">
+        <FaSpinner />
+      </div>
+    ); // Show loading indicator
   }
 
   return (

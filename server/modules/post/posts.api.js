@@ -29,19 +29,29 @@ postRouter.get("/", async (req, res, next) => {
       author = decoded.userId;
     }
     let data;
+    // Check if the user is authenticated
     if (!author) {
+      // If the user is not authenticated, fetch 5 random posts
       data = await postModel
-        .find({})
+        .aggregate([{ $sample: { size: 5 } }]) // This returns 5 random documents
         .populate("author", "name")
-        .sort({ createdAt: -1 })
-        .limit(5);
+        .sort({ createdAt: -1 });
     } else {
+      // If the user is authenticated, fetch their posts
       data = await postModel
         .find({ author })
         .populate("author", "name")
         .sort({ createdAt: -1 });
+      // If user has no posts, fetch 5 random posts
+      if (data.length === 0) {
+        data = await postModel
+          .aggregate([{ $sample: { size: 5 } }]) // This returns 5 random documents
+          .populate("author", "name")
+          .sort({ createdAt: -1 });
+      }
     }
-    if (data.length <= 0) {
+    // Check if no posts found
+    if (!data || data.length <= 0) {
       return res.status(404).send({ message: "No Posts Found!" });
     }
     res.status(200).send({ data });
