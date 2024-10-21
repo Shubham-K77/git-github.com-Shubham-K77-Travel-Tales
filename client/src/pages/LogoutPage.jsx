@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUserInfo } from "../slices/userSlice";
+import { clearUserInfo } from "../slices/userSlice"; // Adjust the path
+
 const LogoutPage = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -30,7 +31,7 @@ const LogoutPage = () => {
             dispatch(clearUserInfo());
             enqueueSnackbar("Logged out successfully!", { variant: "success" });
             setTimeout(() => {
-              navigate("/");
+              navigate("/"); // Redirect to home after successful logout
             }, 3000);
           } else {
             enqueueSnackbar("Logout failed! Please try again.", {
@@ -38,6 +39,7 @@ const LogoutPage = () => {
             });
           }
         } catch (error) {
+          // Display specific error messages if possible
           const errorMessage =
             error.response?.data?.message || "Internal Error!";
           enqueueSnackbar(errorMessage, { variant: "error" });
