@@ -15,6 +15,8 @@ const CreatePost = () => {
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState(null);
+
+  // Quill Editor configurations
   const modules = {
     toolbar: [
       [{ header: [1, 2, false] }],
@@ -47,43 +49,48 @@ const CreatePost = () => {
   useEffect(() => {
     if (userData === null) {
       enqueueSnackbar("Must Login To Access!", { variant: "error" });
-      return navigate("/");
+      navigate("/");
     }
   }, [userData, navigate, enqueueSnackbar]);
 
   const submitHandle = async () => {
+    // Validation for required fields
+    if (!title || !summary || !content || !files) {
+      return enqueueSnackbar("Required Information Missing!", {
+        variant: "error",
+      });
+    }
+    if (title.length < 10) {
+      return enqueueSnackbar("Not Enough Words For The Title!", {
+        variant: "error",
+      });
+    }
+    if (summary.length < 40) {
+      return enqueueSnackbar("Not Enough Words For The Summary!", {
+        variant: "error",
+      });
+    }
+    if (content.length < 300) {
+      return enqueueSnackbar("Not Enough Words For The Content!", {
+        variant: "error",
+      });
+    }
+    if (files && files.length > 0 && files[0].size >= 5000000) {
+      return enqueueSnackbar("File Size Must Be Less Than 5MB", {
+        variant: "error",
+      });
+    }
+
     try {
       const data = new FormData();
       data.set("title", title);
       data.set("summary", summary);
       data.set("content", content);
-      if (files && files.length > 0 && files[0].size < 5000000) {
-        data.set("file", files[0]);
-      } else {
-        return enqueueSnackbar("File Size Must Be Less Than 5MB", {
-          variant: "error",
-        });
+      if (files && files.length > 0) {
+        data.set("file", files[0]); // Assuming only one file upload
       }
-      if (!title || !summary || !content || !files) {
-        return enqueueSnackbar("Required Information Missing!", {
-          variant: "error",
-        });
-      }
-      if (title.length < 10) {
-        return enqueueSnackbar("Not Enough Words For The Title!", {
-          variant: "error",
-        });
-      }
-      if (summary.length < 40) {
-        return enqueueSnackbar("Not Enough Words For The Summary!", {
-          variant: "error",
-        });
-      }
-      if (content.length < 300) {
-        return enqueueSnackbar("Not Enough Words For The Content!", {
-          variant: "error",
-        });
-      }
+
+      // API call to create the post
       const response = await axios.post(
         "https://travel-tales-api.vercel.app/api/v1/posts/create",
         data,
@@ -91,22 +98,28 @@ const CreatePost = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true, // Include credentials for CORS
         }
       );
-      if (!response || response.status != 201) {
-        return enqueueSnackbar("Unable To Create Post!", { variant: "error" });
+
+      if (response.status === 201) {
+        enqueueSnackbar("Successfully Created The Post!", {
+          variant: "success",
+        });
+        // Reset the form
+        setTitle("");
+        setSummary("");
+        setContent("");
+        setFiles(null);
+        setTimeout(() => {
+          navigate("/"); // Redirect to homepage after successful creation
+        }, 2000);
+      } else {
+        enqueueSnackbar("Unable To Create Post!", { variant: "error" });
       }
-      enqueueSnackbar("Successfully Created The Post!", { variant: "success" });
-      setTitle("");
-      setSummary("");
-      setContent("");
-      setFiles(null);
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
     } catch (error) {
       enqueueSnackbar("Error In The Server!", { variant: "error" });
-      console.error(error);
+      console.error("Error creating post:", error);
     }
   };
 
@@ -138,16 +151,19 @@ const CreatePost = () => {
               Create Post
             </div>
           </div>
-          <form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submitHandle();
+            }}
+          >
             <div className="mb-[1rem]">
               <input
                 type="text"
                 placeholder="Title"
                 name="title"
                 value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                }}
+                onChange={(e) => setTitle(e.target.value)}
                 className="h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-black border-2 hover:ring-2 rounded-md hover:ring-green-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw]"
                 required
               />
@@ -158,9 +174,7 @@ const CreatePost = () => {
                 placeholder="Summary"
                 name="summary"
                 value={summary}
-                onChange={(e) => {
-                  setSummary(e.target.value);
-                }}
+                onChange={(e) => setSummary(e.target.value)}
                 className="h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-black border-2 hover:ring-2 rounded-md hover:ring-green-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw]"
                 required
               />
@@ -168,11 +182,8 @@ const CreatePost = () => {
             <div className="mb-[1rem]">
               <input
                 type="file"
-                placeholder="Select Photo"
                 name="file"
-                onChange={(e) => {
-                  setFiles(e.target.files); // Handle file selection
-                }}
+                onChange={(e) => setFiles(e.target.files)} // Handle file selection
                 className="h-[9vh] w-[88vw] p-2 text-[1.25rem] border-2 hover:ring-2 rounded-md hover:ring-green-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw]"
                 required
               />
@@ -185,17 +196,14 @@ const CreatePost = () => {
                 formats={formats}
                 value={content}
                 name="content"
-                onChange={(newValue) => {
-                  setContent(newValue);
-                }}
+                onChange={(newValue) => setContent(newValue)}
                 required
               />
             </div>
             <div className="mb-[1rem]">
               <button
-                type="button"
+                type="submit"
                 className="h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-white border-2 hover:ring-2 hover:ring-green-500 rounded-md bg-green-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw] shadow-md mt-[3rem] hover:bg-green-600"
-                onClick={submitHandle}
               >
                 Create Post
               </button>

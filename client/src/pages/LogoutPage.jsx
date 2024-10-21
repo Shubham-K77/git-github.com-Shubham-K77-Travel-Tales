@@ -14,7 +14,8 @@ const LogoutPage = () => {
   useEffect(() => {
     if (!userToken) {
       enqueueSnackbar("User Not Logged In!", { variant: "warning" });
-      navigate("/");
+      setLoading(false); // Stop loading if user is not logged in
+      navigate("/"); // Redirect to home page
     } else {
       const handleLogout = async () => {
         try {
@@ -27,24 +28,26 @@ const LogoutPage = () => {
           if (response.status === 200) {
             enqueueSnackbar("Logging Out! Success!", { variant: "success" });
             setTimeout(() => {
-              navigate("/");
+              navigate("/"); // Redirect to home after successful logout
             }, 3000);
           } else {
             enqueueSnackbar("Logging Out! Failed!", { variant: "error" });
             setTimeout(() => {
-              navigate("/logout");
+              navigate("/logout"); // Stay on the logout page if failed
             }, 2000);
           }
         } catch (error) {
-          enqueueSnackbar("Internal Error!", { variant: "warning" });
+          enqueueSnackbar("Internal Error!", { variant: "error" });
           console.error("Logout failed:", error);
         } finally {
-          setLoading(false);
+          setLoading(false); // Ensure loading state is stopped
         }
       };
+
       handleLogout();
     }
   }, [enqueueSnackbar, navigate, userToken]);
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       {loading ? (
