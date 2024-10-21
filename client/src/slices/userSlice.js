@@ -11,11 +11,8 @@ const userSlice = createSlice({
     setUserInfo: (state, action) => {
       state.userData = action.payload; // Set user data
     },
-    clearUserInfo: (state) => {
-      state.userData = null; // Clear user data on logout
-    },
   },
 });
 
-export const { setUserInfo, clearUserInfo } = userSlice.actions;
+export const { setUserInfo } = userSlice.actions;
 export default userSlice.reducer;

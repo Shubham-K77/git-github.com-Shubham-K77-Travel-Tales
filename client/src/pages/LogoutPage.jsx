@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUserInfo } from "../slices/userSlice"; // Adjust the path
 
 const LogoutPage = () => {
   const navigate = useNavigate();
@@ -28,7 +27,6 @@ const LogoutPage = () => {
           );
 
           if (response.status === 200) {
-            dispatch(clearUserInfo());
             enqueueSnackbar("Logged out successfully!", { variant: "success" });
             setTimeout(() => {
               navigate("/");

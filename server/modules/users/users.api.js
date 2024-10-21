@@ -115,12 +115,14 @@ userRouter.get("/fetchCookie", async (req, res, next) => {
 });
 
 // Logout route
+// Logout route
 userRouter.post("/logout", async (req, res, next) => {
   try {
-    res.cookie("token", "", {
+    // Clear the token cookie
+    res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      maxAge: 0,
+      secure: true,
+      sameSite: "None",
     });
     res.status(200).send({ message: "Logged Out! Successfully!" });
   } catch (error) {
