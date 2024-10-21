@@ -3,9 +3,9 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { clearUserInfo } from "path_to_your_userSlice"; // Adjust the path
+
 const LogoutPage = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -17,7 +17,7 @@ const LogoutPage = () => {
     if (!userToken) {
       enqueueSnackbar("User Not Logged In!", { variant: "warning" });
       setLoading(false);
-      navigate("/");
+      navigate("/"); // Redirect to home if user is not logged in
     } else {
       const handleLogout = async () => {
         try {
@@ -29,13 +29,20 @@ const LogoutPage = () => {
 
           if (response.status === 200) {
             dispatch(clearUserInfo());
-            enqueueSnackbar("Logging Out! Success!", { variant: "success" });
+            enqueueSnackbar("Logged out successfully!", { variant: "success" });
             setTimeout(() => {
-              navigate("/");
+              navigate("/"); // Redirect to home after successful logout
             }, 3000);
+          } else {
+            enqueueSnackbar("Logout failed! Please try again.", {
+              variant: "error",
+            });
           }
         } catch (error) {
-          enqueueSnackbar("Internal Error!", { variant: "error" });
+          // Display specific error messages if possible
+          const errorMessage =
+            error.response?.data?.message || "Internal Error!";
+          enqueueSnackbar(errorMessage, { variant: "error" });
           console.error("Logout failed:", error);
         } finally {
           setLoading(false);
@@ -58,4 +65,5 @@ const LogoutPage = () => {
     </div>
   );
 };
+
 export default LogoutPage;
