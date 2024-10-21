@@ -5,17 +5,15 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
-  // Access the snackbar context
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  // Registration Elements
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Function Handling The Rest API:
   const registerUser = async () => {
     try {
       setLoading(true);
@@ -24,15 +22,13 @@ const RegisterPage = () => {
         setLoading(false);
         return;
       }
-      //The Password's Didn't Matched
+
       if (password !== confirmPassword) {
-        enqueueSnackbar("User Creation Failed! Password's Didn't Matched!", {
-          variant: "error",
-        });
+        enqueueSnackbar("Password's Didn't Match!", { variant: "error" });
         setLoading(false);
         return;
       }
-      // Data are filled properly
+
       const create = await axios.post(
         "https://travel-tales-api.vercel.app/api/v1/users/register/",
         {
@@ -41,28 +37,25 @@ const RegisterPage = () => {
           password,
         }
       );
-      //Creation Failure!
+
       if (!create) {
         enqueueSnackbar("User Creation Failed!", { variant: "info" });
         return;
       }
-      //Creation Success!
+
       enqueueSnackbar("User Creation Successful!", { variant: "success" });
-      //Reset The Field Values
+
       setName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      //Resend The User Back To HomePage
+
       setTimeout(() => {
         navigate("/");
       }, 2000);
       setLoading(false);
     } catch (error) {
-      enqueueSnackbar(
-        "Internal Error! Request Failed! Password's Didn't Matched!",
-        { variant: "error" }
-      );
+      enqueueSnackbar("Request Failed! Error Occurred!", { variant: "error" });
       console.error(error);
     }
   };
