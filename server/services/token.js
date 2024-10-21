@@ -11,6 +11,7 @@ const createToken = (req, res, userId) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: false, //Https
+    sameSite: "none", //Allows CORS
     maxAge: 3600000, //1H
   });
 };
