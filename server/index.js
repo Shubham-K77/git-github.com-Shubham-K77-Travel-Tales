@@ -18,7 +18,7 @@ const __dirname = dirname(__filename);
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://travel-tales-orpin.vercel.app/",
     credentials: true,
   })
 );
