@@ -39,7 +39,6 @@ const LogoutPage = () => {
             });
           }
         } catch (error) {
-          // Display specific error messages if possible
           const errorMessage =
             error.response?.data?.message || "Internal Error!";
           enqueueSnackbar(errorMessage, { variant: "error" });
