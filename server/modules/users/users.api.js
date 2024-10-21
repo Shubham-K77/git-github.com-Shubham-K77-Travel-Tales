@@ -13,7 +13,7 @@ const userRouter = express.Router();
 // Fetch all users
 userRouter.get("/", protect, async (req, res, next) => {
   try {
-    let data = await userModel.find();
+    const data = await userModel.find();
     if (!data.length) {
       return res.status(200).send({ message: "No users found", data: [] });
     }
@@ -47,11 +47,17 @@ userRouter.post("/register", async (req, res, next) => {
       return res.status(500).send({ message: "Internal Error! DB Error!" });
     }
 
+    // Email sending logic (non-blocking)
+    try {
+      await mailer({ userMail: email, subject: "newuser" });
+    } catch (error) {
+      console.error("Email sending failed:", error.message);
+    }
+
     res.status(201).send({ message: "User Created!" });
-    await mailer({ userMail: email, subject: "newuser" });
   } catch (error) {
     error.message = "Internal Error!";
-    error.status = 500;
+    res.status(500).send({ message: error.message });
     next(error);
   }
 });
@@ -79,7 +85,7 @@ userRouter.post("/login", async (req, res, next) => {
     res.status(200).send({ message: "Logged in successfully!" });
   } catch (error) {
     error.message = "Internal Error!";
-    res.status(500);
+    res.status(500).send({ message: error.message });
     next(error);
   }
 });
@@ -95,7 +101,10 @@ userRouter.get("/fetchCookie", async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userData = await userModel.findOne({ _id: decoded });
+    const userData = await userModel
+      .findById(decoded.userId)
+      .select("-password");
+
     if (!userData) {
       return res.status(400).send({ message: "User not found" });
     }
@@ -103,9 +112,17 @@ userRouter.get("/fetchCookie", async (req, res, next) => {
     res.status(200).send({ userData, message: "Fetched user successfully!" });
   } catch (error) {
     error.message = "Error fetching user!";
-    res.status(500);
+    res.status(500).send({ message: error.message });
     next(error);
   }
 });
 
 export default userRouter;
+
+export const getUserEmailById = async (userId) => {
+  const user = await userModel.findById(userId).select("email");
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user.email;
+};

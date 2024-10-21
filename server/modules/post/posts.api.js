@@ -1,4 +1,3 @@
-// IMPORTS AND CONSTANTS
 import express from "express";
 import multer from "multer";
 import cloudinary from "../../config/cloudinary.js";
@@ -7,18 +6,13 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import mailer from "../../services/mailer.js";
 import { getUserEmailById } from "../users/users.api.js";
-
 dotenv.config();
-
 const uploadMW = multer({
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5 MB
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
-
 const postRouter = express.Router();
 const secret = process.env.JWT_SECRET;
-
 // ROUTING PATHS =>
-
 // Get posts
 postRouter.get("/", async (req, res, next) => {
   try {
@@ -29,29 +23,25 @@ postRouter.get("/", async (req, res, next) => {
       author = decoded.userId;
     }
     let data;
-    // Check if the user is authenticated
     if (!author) {
-      // If the user is not authenticated, fetch 5 random posts
+      // Fetch 5 random posts if user not authenticated
       data = await postModel
-        .aggregate([{ $sample: { size: 5 } }]) // This returns 5 random documents
-        .populate("author", "name")
+        .aggregate([{ $sample: { size: 5 } }]) // Returns 5 random posts
         .sort({ createdAt: -1 });
     } else {
-      // If the user is authenticated, fetch their posts
+      // Fetch user's posts
       data = await postModel
         .find({ author })
         .populate("author", "name")
         .sort({ createdAt: -1 });
-      // If user has no posts, fetch 5 random posts
+      // If no posts, fetch random posts
       if (data.length === 0) {
         data = await postModel
-          .aggregate([{ $sample: { size: 5 } }]) // This returns 5 random documents
-          .populate("author", "name")
+          .aggregate([{ $sample: { size: 5 } }])
           .sort({ createdAt: -1 });
       }
     }
-    // Check if no posts found
-    if (!data || data.length <= 0) {
+    if (!data || data.length === 0) {
       return res.status(404).send({ message: "No Posts Found!" });
     }
     res.status(200).send({ data });
@@ -65,11 +55,8 @@ postRouter.get("/", async (req, res, next) => {
 // Create a new post
 postRouter.post("/create", uploadMW.single("file"), async (req, res, next) => {
   try {
-    console.log("Uploaded file:", req.file);
     if (!req.file) {
-      const error = new Error("File Is Required!");
-      res.status(400);
-      return next(error);
+      return res.status(400).send({ message: "File is required!" });
     }
     const token = req.cookies.token;
     if (!token) {
@@ -81,19 +68,17 @@ postRouter.post("/create", uploadMW.single("file"), async (req, res, next) => {
     }
     const userId = decoded.userId;
     const { title, summary, content } = req.body;
-    if (!title || !summary || !content || !userId) {
-      const error = new Error("All fields must be filled!");
-      res.status(400);
-      return next(error);
+    if (!title || !summary || !content) {
+      return res.status(400).send({ message: "All fields must be filled!" });
     }
-    // Upload image to Cloudinary using buffer
+    // Upload image to Cloudinary
     const uploadStream = cloudinary.v2.uploader.upload_stream(
       async (error, uploadResponse) => {
         if (error) {
-          console.error("Cloudinary Upload Error: ", error);
+          console.error("Cloudinary Upload Error:", error);
           return res.status(500).send({ message: "Cloudinary upload failed!" });
         }
-        // Create the post after successful upload
+        // Create post after successful image upload
         const post = await postModel.create({
           title,
           summary,
@@ -102,19 +87,25 @@ postRouter.post("/create", uploadMW.single("file"), async (req, res, next) => {
           author: userId,
         });
         if (!post) {
-          const error = new Error("Error creating post! Internal Error!");
-          res.status(500);
-          return next(error);
+          return res.status(500).send({ message: "Error creating post!" });
         }
-        res.status(201).send({ message: "Post Successfully Created!" });
-        const mail = await getUserEmailById(userId);
-        await mailer({ userMail: mail, subject: "newpost", blogTitle: title });
+        res.status(201).send({ message: "Post successfully created!" });
+        // Send email (non-blocking)
+        try {
+          const mail = await getUserEmailById(userId);
+          await mailer({
+            userMail: mail,
+            subject: "newpost",
+            blogTitle: title,
+          });
+        } catch (error) {
+          console.error("Email sending failed:", error.message);
+        }
       }
     );
-    // End the stream with the file buffer
+    // End the Cloudinary upload stream
     uploadStream.end(req.file.buffer);
   } catch (error) {
-    console.error(error);
     error.message = "Internal Error!";
     res.status(500);
     next(error);
