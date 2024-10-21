@@ -41,7 +41,7 @@ const mailer = async ({ userMail, subject, blogTitle = " " }) => {
   } else if (subject == "newpost") {
     mailSubject = "Thanking For Your Contribution!";
     mailContent = `<div style="font-family: Verdana, sans-serif; line-height: 1.6; font-size: 16px; color: #333;">
-        <p>Hello [User's Name],</p>
+        <p>Hello User,</p>
         <p>
           Thank you for contributing to <strong>Travel Tales</strong> by sharing your latest post, "<strong>${blogTitle}</strong>." 
           Your input adds immense value to our community of travelers, and we're thrilled to have you as an active participant. 
