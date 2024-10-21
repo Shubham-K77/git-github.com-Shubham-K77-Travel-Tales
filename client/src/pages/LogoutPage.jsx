@@ -31,7 +31,7 @@ const LogoutPage = () => {
             dispatch(clearUserInfo());
             enqueueSnackbar("Logged out successfully!", { variant: "success" });
             setTimeout(() => {
-              navigate("/"); // Redirect to home after successful logout
+              navigate("/");
             }, 3000);
           } else {
             enqueueSnackbar("Logout failed! Please try again.", {

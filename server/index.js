@@ -13,7 +13,7 @@ dotenv.config();
 // Middleware
 app.use(
   cors({
-    origin: "https://travel-tales-kohl.vercel.app", // Allow requests from your frontend
+    origin: "https://travel-tales-iota.vercel.app", // Allow requests from your frontend
     credentials: true, // Allow cookies to be sent in requests
   })
 );
