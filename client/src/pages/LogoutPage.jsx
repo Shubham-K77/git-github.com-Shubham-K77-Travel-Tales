@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUserInfo } from "path_to_your_userSlice"; // Adjust the path
+import { clearUserInfo } from "../slices/userSlice"; // Adjust the path
 
 const LogoutPage = () => {
   const navigate = useNavigate();
