@@ -5,28 +5,20 @@ import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import router from "./routes/index.js";
 import { notFound, errorHandle } from "./middleware/error.js";
-import { fileURLToPath } from "url";
-import { dirname } from "path"; // Add this line
-import path from "path"; // Add this line
 
 // Constants
 const app = express();
 dotenv.config();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Middleware
 app.use(
   cors({
-    origin: "https://travel-tales-orpin.vercel.app",
-    credentials: true,
+    origin: "https://travel-tales-orpin.vercel.app", // Allow requests from your frontend
+    credentials: true, // Allow cookies to be sent in requests
   })
 );
 app.use(cookieParser());
 app.use(express.json());
-
-// Serve static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/", router);
