@@ -27,6 +27,7 @@ postRouter.get("/", async (req, res, next) => {
       // Fetch 5 random posts if user not authenticated
       data = await postModel
         .aggregate([{ $sample: { size: 5 } }]) // Returns 5 random posts
+        .populate("author", "name") // Populate author name if needed
         .sort({ createdAt: -1 });
     } else {
       // Fetch user's posts
@@ -38,6 +39,7 @@ postRouter.get("/", async (req, res, next) => {
       if (data.length === 0) {
         data = await postModel
           .aggregate([{ $sample: { size: 5 } }])
+          .populate("author", "name")
           .sort({ createdAt: -1 });
       }
     }
