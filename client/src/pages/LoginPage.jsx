@@ -5,58 +5,62 @@ import { useSnackbar } from "notistack";
 import axios from "axios";
 
 const LoginPage = () => {
-  // Constants
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  // State for email and password
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  //Handle Login
+
   const handleLogin = async () => {
-    // Start loading
     setLoading(true);
-    // Validation: Check if email or password is missing
     if (!email || !password) {
       enqueueSnackbar("Credentials are missing!", { variant: "error" });
       setLoading(false);
-      return; // Stop execution if validation fails
+      return;
     }
+
     try {
-      // Send login request
-      const query = await axios.post(
+      const response = await axios.post(
         "https://travel-tales-api.vercel.app/api/v1/users/login/",
         { email, password },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      // Handle failed login case
-      if (!query) {
+
+      if (!response.data) {
         enqueueSnackbar("Login failed!", { variant: "error" });
         setLoading(false);
-        return; // Stop execution if login fails
+        return;
       }
-      // Successful login
+
       enqueueSnackbar("Login successful!", { variant: "success" });
-      // Reset form
       setEmail("");
       setPassword("");
-      // Redirect user to the homepage after 3 seconds
+
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error) {
-      // Handle any errors
-      enqueueSnackbar("Internal Error! {Server Failed OR Password Wrong!}", {
-        variant: "error",
-      });
-      setLoading(false); // Stop loading on error
-      console.error(error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        enqueueSnackbar(error.response.data.message || "Internal Error!", {
+          variant: "error",
+        });
+      } else {
+        console.error("Error:", error.message);
+        enqueueSnackbar("Internal Error! {Server Failed OR Password Wrong!}", {
+          variant: "error",
+        });
+      }
     } finally {
-      setLoading(false); // Ensure loading state is stopped
+      setLoading(false);
     }
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    handleLogin();
+  };
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center">
       <Navbar />
@@ -86,15 +90,16 @@ const LoginPage = () => {
             </div>
           </div>
           <div>
-            <form className="flex flex-col justify-evenly items-center">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col justify-evenly items-center"
+            >
               <input
                 className="w-[78vw] h-[8vh] lg:w-[48vw] lg:h-[10vh] flex justify-center items-center p-2 text-[1.5rem] font-[sans-serif] ring-2 ring-gray-200 hover:ring-2 hover:ring-green-500 rounded-md mb-4"
                 name="email"
                 placeholder="Email Address"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <input
@@ -103,17 +108,14 @@ const LoginPage = () => {
                 placeholder="Password"
                 type="password"
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
               <button
                 className={`w-[78vw] h-[8vh] lg:w-[48vw] lg:h-[10vh] flex justify-center items-center p-2 text-[1.5rem] font-[sans-serif] rounded-md mb-2 bg-red-500 text-white shadow-md hover:bg-red-600 ${
                   loading ? "animate-pulse" : ""
                 }`}
-                type="button"
-                onClick={handleLogin}
+                type="submit"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
