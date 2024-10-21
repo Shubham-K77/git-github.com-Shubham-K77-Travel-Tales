@@ -194,7 +194,7 @@ const CreatePost = () => {
                 required
               />
             </div>
-            <div className="mb-[2rem] lg:mb-[1rem]">
+            <div className="mb-[2rem] lg:mb-[2rem]">
               <ReactQuill
                 theme="snow"
                 className="h-[16vh] mb-[1rem]"
