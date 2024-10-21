@@ -117,17 +117,15 @@ userRouter.get("/fetchCookie", async (req, res, next) => {
 // Logout route
 userRouter.post("/logout", async (req, res, next) => {
   try {
-    // Set the cookie with an empty value and a short expiration time
     res.cookie("token", "", {
-      expires: new Date(Date.now() + 1),
       httpOnly: true,
+      secure: false,
+      maxAge: 0,
     });
-
-    // Respond with a success message
-    res.status(200).send({ message: "Logged out successfully!" });
+    res.status(200).send({ message: "Logged Out! Successfully!" });
   } catch (error) {
-    error.message = "Internal Error!";
-    res.status(500).send({ message: error.message });
+    error.message = "Internal Error! Server Error";
+    res.status(500);
     next(error);
   }
 });
