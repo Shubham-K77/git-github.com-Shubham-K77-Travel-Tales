@@ -211,7 +211,7 @@ const EditPost = () => {
             <div className="mb-[1rem]">
               <button
                 type="button"
-                className={`"h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-white border-2 hover:ring-2 hover:ring-green-500 rounded-md bg-teal-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw] shadow-md mt-[3rem] hover:bg-teal-600" ${
+                className={`"h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-white border-2 hover:ring-2 hover:ring-green-500 hover:bg-teal-600 rounded-md bg-teal-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw] shadow-md mt-[3rem]" ${
                   loading === true ? "animate-pulse" : "animate-none"
                 }`}
                 onClick={submitEdit}

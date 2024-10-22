@@ -15,6 +15,7 @@ const CreatePost = () => {
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Quill Editor configurations
   const modules = {
@@ -60,28 +61,34 @@ const CreatePost = () => {
   };
 
   const submitHandle = async () => {
+    setLoading(true);
     // Validation for required fields
     if (!title || !summary || !content || !files) {
+      setLoading(false);
       return enqueueSnackbar("Required Information Missing!", {
         variant: "error",
       });
     }
     if (title.length < 10) {
+      setLoading(false);
       return enqueueSnackbar("Not Enough Words For The Title!", {
         variant: "error",
       });
     }
     if (summary.length < 40) {
+      setLoading(false);
       return enqueueSnackbar("Not Enough Words For The Summary!", {
         variant: "error",
       });
     }
     if (content.length < 300) {
+      setLoading(false);
       return enqueueSnackbar("Not Enough Words For The Content!", {
         variant: "error",
       });
     }
     if (files && files.length > 0 && files[0].size >= 5000000) {
+      setLoading(false);
       return enqueueSnackbar("File Size Must Be Less Than 5MB", {
         variant: "error",
       });
@@ -95,7 +102,6 @@ const CreatePost = () => {
       if (files && files.length > 0) {
         data.set("file", files[0]); // Assuming only one file upload
       }
-
       // API call to create the post
       const response = await axios.post(
         "https://travel-tales-api.vercel.app/api/v1/posts/create",
@@ -107,8 +113,8 @@ const CreatePost = () => {
           withCredentials: true, // Include credentials for CORS
         }
       );
-
       if (response.status === 201) {
+        setLoading(false);
         enqueueSnackbar("Successfully Created The Post!", {
           variant: "success",
         });
@@ -121,9 +127,11 @@ const CreatePost = () => {
           navigate("/"); // Redirect to homepage after successful creation
         }, 2000);
       } else {
-        enqueueSnackbar("Unable To Create Post!", { variant: "error" });
+        setLoading(false);
+        return enqueueSnackbar("Unable To Create Post!", { variant: "error" });
       }
     } catch (error) {
+      setLoading(false);
       enqueueSnackbar("Error In The Server!", { variant: "error" });
       console.error("Error creating post:", error);
     }
@@ -206,10 +214,12 @@ const CreatePost = () => {
                 required
               />
             </div>
-            <div className="h-[10vh] lg:h-[11vh] flex justify-center items-center">
+            <div className="mb-[1rem]">
               <button
                 type="submit"
-                className="h-[8vh] w-[50vw] p-2 bg-green-500 text-[1.5rem] text-white font-bold rounded-md hover:scale-105 transition-transform lg:text-[2rem] lg:h-[10vh] lg:w-[20vw]"
+                className={`"h-[8.5vh] w-[88vw] p-2 text-[1.25rem] text-white border-2 hover:ring-2 hover:ring-green-500 hover:bg-amber-600 rounded-md bg-amber-500 lg:h-[10vh] lg:text-[1.5rem] lg:w-[52vw] shadow-md mt-[3rem]" ${
+                  loading === true ? "animate-pulse" : "animate-none"
+                }`}
               >
                 Post
               </button>
